@@ -16,7 +16,9 @@
 	  body > section {
     scroll-margin-top: 70px;scroll-padding-bottom: 100px; 
 }
-	  
+	  .leaflet-marker-icon {
+  filter: invert(100%) brightness(200%);
+}
     :root{
       --brand:#4cafef;
       --brand-hover:#2196f3;
@@ -436,12 +438,12 @@
 	
 	// Define a white marker icon
 	const whiteIcon = L.icon({
-	  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-white.png',
+	  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-black.png',
 	  shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
-	  iconSize:     [25, 41],  // size of the icon
-	  iconAnchor:   [12, 41],  // point of the icon which will correspond to marker's location
-	  popupAnchor:  [1, -34],  // point from which the popup should open relative to the iconAnchor
-	  shadowSize:   [41, 41]   // size of the shadow
+	  iconSize: [25, 41],
+	  iconAnchor: [12, 41],
+	  popupAnchor: [1, -34],
+	  shadowSize: [41, 41]
 	});
 	// Add markers
 	const markers = L.featureGroup();
