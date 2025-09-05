@@ -308,14 +308,8 @@ width:400px;            /* Set a firm max width */
    background: transparent;
 }
 .header__logo {
-    width: 1%;
+    width: auto;
     height: 65px;
-    -ms-flex-negative: 1;
-    flex-shrink: 1;
-    -webkit-box-flex: 10;
-    -ms-flex-positive: 10;
-    flex-grow: 10;
-    max-width: 75%;
     display: flex;
     align-items: center;
     justify-content: center;
