@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI in Austin | Artificial Intelligence, Robotics & Technology</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+	  body > section {
+    scroll-margin-top: 70px;scroll-padding-bottom: 100px; 
+}
+	  
+    :root{
+      --brand:#4cafef;
+      --brand-hover:#2196f3;
+      --ai:#f1f1f1;
+      --text:#111;
+    }
+    *{box-sizing:border-box}
+.anchorlink.customlinhyt {
+    line-height: 2;
+}
+    /* Overlay (click-outside to close) */
+    #chatOverlay{
+      position:fixed;inset:0;background:rgba(0,0,0,.2);backdrop-filter:saturate(120%) blur(1px);
+      display:none;z-index:998;
+    }
+
+    /* Floating Mic */
+    #micButton{
+      cursor:pointer;
+    }
+    #micButton:active{transform:scale(.98)}
+    #micButton.listening{animation:pulse 1.5s infinite}
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(229,57,53,.7)}
+      70%{box-shadow:0 0 0 20px rgba(229,57,53,0)}
+      100%{box-shadow:0 0 0 0 rgba(229,57,53,0)}
+    }
+
+    /* Chatbox */
+    #chatbox {
+    left: 100px;
+    position: absolute;
+    bottom: -25px;
+    right: auto;
+    width: 640px;
+    height: 280px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 999;
+}
+
+    /* Top bar */
+    #chatTop{
+      padding:10px;border-bottom:1px solid #eee;background:#fff;display:flex;align-items:center
+    }
+    #closeChat{
+      margin-left:auto;background:transparent;border:none;font-size:18px;line-height:1;cursor:pointer;color:#666
+    }
+    #closeChat:hover{color:#000}
+
+    #chatMessages{flex:1;padding:12px;overflow-y:auto;font-size:14px;background:#fff}
+    .message{margin:6px 0;padding:8px 10px;border-radius:10px;max-width:85%;word-wrap:break-word;white-space:pre-wrap}
+    .user{background:var(--brand);color:#fff;align-self:flex-end}
+    .ai{background:var(--ai);color:#000;align-self:flex-start}
+
+    #chatInputArea{display:flex;border-top:1px solid #eee;background:#fff}
+    #chatInput{flex:1;padding:12px;border:none;outline:none;font-size:14px}
+    #sendButton{background:var(--brand);border:none;color:#fff;padding:10px 14px;cursor:pointer}
+    #sendButton:hover{background:var(--brand-hover)}
+
+    /* Articles rendering */
+    .article-list{margin:6px 0 8px;padding-left:0;list-style:none}
+    .article-item{margin:6px 0}
+    .article-item a{text-decoration:none;font-weight:600;color:#0b69ff}
+    .article-item a:hover{text-decoration:underline}
+    .article-meta{display:block;font-size:12px;color:#666;margin-top:2px}
+    .as-of{font-size:12px;color:#555;margin-top:8px}
+	/* Thinking indicator */
+    .typing{ display:inline-flex; align-items:center; gap:6px }
+    .typing .dot{ width:6px; height:6px; border-radius:50%; background:#555; animation:bounce 1s infinite ease-in-out }
+    .typing .dot:nth-child(2){ animation-delay:.15s } .typing .dot:nth-child(3){ animation-delay:.3s }
+    @keyframes bounce{ 0%,80%,100%{ transform:scale(.6); opacity:.6 } 40%{ transform:scale(1); opacity:1 } }
+
+	  @media screen and (max-width: 768px) {
+	  #chatbox {
+    left: auto;
+    bottom: 100%;
+    width: 480px;
+    height: 400px;
+    margin-bottom: 20px;
+}
+		  .btn_withlovedby {
+    align-items: center;
+}
+	  }
+	  @media screen and (max-width: 600px) {
+	  #chatbox {
+    width: 310px;
+}
+	  }
+	  
+	  /* Container holds video + content */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      overflow: clip;            /* modern, avoids scrollbars */
+      display: grid;
+      place-items: center;
+      background: #000;          /* fallback color */
+    }
+
+    /* The background video */
+    .hero__video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
+      filter: brightness(0.65);  /* darken to improve text contrast */
+    }
+
+    /* Optional gradient overlay for readability */
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(120% 120% at 50% 10%, rgba(0,0,0,0.35), rgba(0,0,0,0.7));
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Foreground content */
+    .hero__content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: #fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      padding: 2rem;
+    }
+
+    .hero__title {
+      font-size: clamp(2rem, 4vw + 1rem, 4rem);
+      margin: 0 0 0.5rem;
+      letter-spacing: 0.01em;
+    }
+    .hero__subtitle {
+      font-size: clamp(1rem, 1.2vw + 0.8rem, 1.5rem);
+      opacity: 0.9;
+      margin: 0 0 1.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 1.25rem;
+      border-radius: 999px;
+      background: #fff;
+      color: #111;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Respect users who prefer reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .hero__video { display: none; } /* fall back to poster/solid bg */
+      .hero { background: #0b0b0b url("/video/hero-poster.jpg") center / cover no-repeat; }
+    }
+	  
+  </style>	
+</head>
+<body class="relative bg-black">
+	<!-- Overlay with Popup -->
+	<div class="overlay" id="popupOverlay">
+	  <div class="popup max-w-3xl mx-auto bg-white shadow-2xl rounded-3xl p-10 md:p-12 relative z-10 backdrop-blur-sm border border-gray-100">
+		<span class="close-btn" id="closePopup">&times;</span>
+	  <div>
+	    <h1>AI <span>Austin</span> Newsletter Signup</h1>
+		<form id="newsletter-form" class="space-y-6">
+		  <div class="relative">
+			<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+			<input type="email" id="email" name="email" placeholder="you@example.com" required
+			  class="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+		  </div>
+
+		  <button type="submit"
+			class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl transition duration-300 shadow-md hover:shadow-lg">
+			🚀 Subscribe Now
+		  </button>
+		</form>
+	  </div>
+	  </div>
+	</div>
+	<header class="site-header header">            
+		<div class="header__logo">
+		  <a href="index.html" class="logo">
+			<img src="omniverse.svg" />
+		  </a>	
+		</div>
+        <!--<div class="header__components">
+		  <div class="header__letter-button">
+            <a id="OpenNewsLetterr" data-hash="newsLetter" class="letter-button usw">
+                <span class="letter-button__desktop-text">Newsletter</span>
+                <span class="letter-button__mobile-text">
+                    <svg width="14" height="10" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M0.5 0.658593H5.5333L8.1751 6.08002L5.5333 11.3414H0.5L3.42632 6.08003L0.5 0.658593Z"></path>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 0.658593H12.5333L15.1751 6.08002L12.5333 11.3414H7.5L10.4263 6.08003L7.5 0.658593Z"></path>
+                    </svg>
+                    Subscribe to our newsletter
+				</span>
+			</a>
+          </div>
+        </div>-->
+	</header>    
+	
+    <!-- Fullwidth Map -->
+    <section id="omniversemap" class="hero w-full  py-8 mt-16 pb-8 px-4 sm:px-6 lg:px-12 " aria-label="Hero background video section">
+		<!-- Background video -->
+		<video
+		  class="hero__video"
+		  autoplay
+		  muted
+		  loop
+		  playsinline
+		  preload="none"
+		>
+		  <source src="bg-video-omni.mp4"  type="video/mp4" />
+		</video>
+		<!-- Foreground content -->
+		<div class="hero__content">
+		  <div class="relative z-10 w-full mb-4  mob-mt-0  text-center">
+			<h1  style=" font-family:poppins, sans-serif" class="text-3xl md:text-5xl  font-bold mb-4 leading-tight text-[#ffffff] ">Connecting the World's </br> Leading AI Domains</h1>
+			<p class="pl-5 pr-5 text-base text-white max-w-3xl mx-auto " style=" font-family:poppins, sans-serif" >
+			  From New York City to Singapore, our network of first-tier AI cities represents the cutting edge of innovation in artificial intelligence, robotics, and technology. Browse, collaborate, connect, or acquire - those who show up will be seen.
+			</p>
+			<p><a href="https://www.ai-omniverse.com/" class="text-base text-white mt-4" style=" font-family:poppins, sans-serif;margin-top: 10px; display: inline-block;" >www.ai-omniverse.com</a></p>
+		  </div>
+		  <div class="h-[400px] sm:h-[500px]" id="map"></div>
+		</div>
+    </section>
+ 
+	<!-- Contact -->
+	<section id="omniverseconnect" class="mt-16 relative py-8 px-6 overflow-hidden">
+	  <div class="max-w-2xl mx-auto text-center mb-8 z-10 relative">
+		<h1 style=" font-family:poppins, sans-serif"  class="text-3xl md:text-5xl font-bold text-[#ffffff]  leading-tight mb-6 [font-family:'Open_Sans']">
+	   Be Part of the World’s Leading AI Movement
+		</h1>
+		<p style=" font-family:poppins, sans-serif"  class="text-base text-white  ">
+		 Join the global network of AI leaders, builders, and visionaries shaping the future through artificial intelligence innovation.
+		</p>
+	  </div>  
+	  <div class="max-w-3xl mx-auto rounded-3xl p-10 md:p-12 relative z-10 border border-gray-100">
+		<form id="contact-form" class="space-y-6">
+		  <div class="relative">
+			<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+			<input type="email" id="email" name="email" placeholder="you@example.com" required
+			  class="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+		  </div>
+
+		  <div class="relative">
+			<label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+			<textarea id="message" rows="5" name="message" placeholder="Type your message here..." required
+			  class="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"></textarea>
+		  </div>
+
+		  <button type="submit"
+			class="w-full from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl transition duration-300 shadow-md hover:shadow-lg">
+			🚀 Send Message
+		  </button>
+		</form>
+	  </div>
+	</section>
+
+  <!-- Footer -->
+  <footer class="text-center text-sm py-6 bg-white/80 backdrop-blur-md border-t border-gray-200">
+	<div class="text-sm footer__links">
+		<a href="legal-disclaimer.html" title="Legal" class="footer__link">Legal Disclaimer</a>
+		<a href="website-disclaimer.html" title="website-disclaimer" class="footer__link">Website Disclaimer</a>
+		<a href="ai-content-technology-disclaimer.html" title="AI Content & Technology disclaimer" class="footer__link">AI Content & Technology Disclaimer</a>
+		<a href="privacy-policy.html" title="Privacy Policy" class="footer__link">Privacy Policy</a>
+		<a href="terms-of-service.html" title="Terms of Service" class="footer__link">Terms of Service</a>
+		<a href="california-consumer-privacy-act.html" title="California Consumer Privacy Act (CCPA)" class="footer__link">California Consumer Privacy Act (CCPA)</a>
+		<a href="web-accessibility-disclaimer.html" title="California Consumer Privacy Act (CCPA)" class="footer__link">Web Accessibility Disclaimer</a>
+	</div>
+	<div class="footer_copyright">
+    &copy; 2025 AI Omniverse. All rights reserved.
+	</div>
+  </footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Optional: Play/pause based on visibility to save battery/data
+    const vid = document.querySelector('.hero__video');
+    if (vid && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            const p = vid.play();
+            if (p && p.catch) p.catch(()=>{ /* ignore autoplay block */ });
+          } else {
+            vid.pause();
+          }
+        });
+      }, { threshold: 0.1 });
+      io.observe(vid);
+    }
+	
+const cities = [
+    { name: 'Austin', url: 'https://ai-austin.com', desc: "Austin’s booming tech scene blends innovation and creativity, making it a fast-rising hub for AI startups and robotics research.", coords: [30.2672, -97.7431] },
+    { name: 'Bangalore', url: 'https://ai-bangalore.com', desc: "Known as the Silicon Valley of India, Bangalore thrives with deep tech talent and a rapidly expanding AI ecosystem.", coords: [12.9716, 77.5946] },
+    { name: 'Barcelona', url: 'https://ai-barcelona.com', desc: "Barcelona is fostering a dynamic AI and robotics environment supported by smart city initiatives and global tech collaboration.", coords: [41.3851, 2.1734] },
+    { name: 'Buenos Aires', url: 'https://ai-buenosaires.com', desc: "Buenos Aires is becoming a Latin American leader in AI and software development, powered by a strong developer culture and growing innovation centers.", coords: [-34.6037, -58.3816] },
+    { name: 'California', url: 'https://ai-cali.com', desc: "California remains the beating heart of global tech, with Silicon Valley continuing to lead the way in AI and robotics breakthroughs.", coords: [36.7783, -119.4179] },
+    { name: 'Delhi', url: 'https://ai-delhi.com', desc: "Delhi is emerging as a powerhouse for AI and deep learning, supported by academic strength and a thriving startup landscape.", coords: [28.6139, 77.2090] },
+    { name: 'Denmark', url: 'https://ai-denmark.com', desc: "Denmark blends cutting-edge AI research with a focus on ethical tech, sustainability, and human-centered robotics.", coords: [56.2639, 9.5018] },
+    { name: 'Doha', url: 'https://ai-doha.com', desc: "Doha is making bold moves in AI and smart infrastructure as it invests heavily in research and next-gen tech talent.", coords: [25.276987, 51.520008] },
+    { name: 'Dublin', url: 'https://ai-dublin.com', desc: "Dublin hosts major global tech headquarters and a vibrant AI scene that connects strong academic research with commercial innovation.", coords: [53.3498, -6.2603] },
+    { name: 'Guangzhou', url: 'https://ai-guangzhou.com', desc: "Guangzhou is becoming a major player in China’s AI and robotics expansion, with deep manufacturing roots and growing R&D investment.", coords: [23.1291, 113.2644] },
+    { name: 'Iceland', url: 'https://ai-iceland.com', desc: "Iceland’s tech sector is small but mighty, with AI applications in energy, health, and language tech taking center stage.", coords: [64.9631, -19.0208] },
+    { name: 'Incheon', url: 'https://aiincheon.com', desc: "Incheon is advancing as a high-tech gateway in South Korea, with smart city projects and AI innovation driving urban transformation.", coords: [37.4563, 126.7052] },
+    { name: 'Leeds', url: 'https://aileeds.com', desc: "Leeds is gaining momentum as a UK tech hub with growing strength in data science, healthtech, and AI-powered analytics.", coords: [53.8008, -1.5491] },
+    { name: 'Manchester', url: 'https://ai-manchester.com', desc: "Manchester mixes rich academic research with tech startup energy, becoming a northern UK hub for AI and automation.", coords: [53.4808, -2.2426] },
+    { name: 'Manila', url: 'https://ai-manila.com', desc: "Manila’s tech industry is growing fast, with strong momentum in AI services, fintech, and digital transformation efforts.", coords: [14.5995, 120.9842] },
+    { name: 'Melbourne', url: 'https://ai-melbourne.com', desc: "Melbourne’s vibrant startup culture and academic excellence are fueling its rise in AI, robotics, and advanced computing.", coords: [-37.8136, 144.9631] },
+    { name: 'Mexico City', url: 'https://ai-mexicocity.com', desc: "Mexico City’s tech community is thriving with AI innovation across education, health, and logistics sectors.", coords: [19.4326, -99.1332] },
+    { name: 'Montreal', url: 'https://ai-montreal.com', desc: "Montreal is globally recognized for its AI research leadership, with strong academic partnerships and a collaborative startup environment.", coords: [45.5017, -73.5673] },
+    { name: 'Mumbai', url: 'https://ai-mumbai.com', desc: "Mumbai is blending fintech, media tech, and AI to become a powerhouse of digital innovation and smart applications.", coords: [19.0760, 72.8777] },
+    { name: 'New York City', url: 'https://ai-newyorkcity.com', desc: "New York City is a major force in AI and robotics, blending finance, health, media, and tech into a powerhouse of applied intelligence.", coords: [40.7128, -74.0060] },
+    { name: 'North Korea', url: 'https://ai-northkorea.com', desc: "North Korea’s AI and tech landscape is largely closed off, but state-driven research in automation and surveillance technologies remains active.", coords: [40.3399, 127.5101] },
+    { name: 'Philadelphia', url: 'https://ai-philadelphia.com', desc: "Philadelphia is growing its tech presence with AI applications in healthcare, biotech, and academic research institutions.", coords: [39.9526, -75.1652] },
+    { name: 'Reykjavik', url: 'https://aireykjavik.com', desc: "Reykjavik is making strides in AI and data science, especially in health tech and natural language processing for smaller languages.", coords: [64.1355, -21.8954] },
+    { name: 'Rome', url: 'https://ai-rome.com', desc: "Rome’s AI scene is developing steadily, with innovation centers focusing on cultural heritage, language tech, and smart urban planning.", coords: [41.9028, 12.4964] },
+    { name: 'Russia', url: 'https://ai-russia.com', desc: "Russia has long invested in AI and robotics, with strong research in defense, autonomous systems, and machine learning.", coords: [61.5240, 105.3188] },
+    { name: 'San Jose', url: 'https://ai-sanjose.com', desc: "San Jose stands at the Landscape of Silicon Valley’s tech innovation, with leading roles in AI hardware, robotics, and cloud infrastructure.", coords: [37.3382, -121.8863] },
+    { name: 'São Paulo', url: 'https://ai-saopaulo.com', desc: "São Paulo is South America’s leading tech hub, with a booming AI startup scene and a strong presence in fintech and logistics automation.", coords: [-23.5505, -46.6333] },
+    { name: 'Seattle', url: 'https://ai-seattle.com', desc: "Seattle leads in cloud, robotics, and applied AI, with strong contributions from companies like Amazon, Microsoft, and a deep research ecosystem.", coords: [47.6062, -122.3321] },
+    { name: 'Shenzhen', url: 'https://ai-shenzhen.com', desc: "Shenzhen is a global leader in robotics, AI hardware, and manufacturing tech, with unmatched speed in tech development and scaling.", coords: [22.5431, 114.0579] },
+    { name: 'Singapore', url: 'https://ai-singapore.com', desc: "Singapore has built a world-class AI ecosystem with government support, smart nation initiatives, and cutting-edge research centers.", coords: [1.3521, 103.8198] },
+    { name: 'Taipei', url: 'https://ai-taipei.com', desc: "Taipei’s AI and robotics scene is thriving, especially in semiconductor innovation, smart devices, and industrial automation.", coords: [25.032969, 121.565418] },
+    { name: 'Vancouver', url: 'https://ai-vancouver.com', desc: "Vancouver boasts a strong AI and visual computing community, with vibrant startup activity and access to global talent.", coords: [49.2827, -123.1207] },
+    { name: 'Vienna', url: 'https://ai-vienna.com', desc: "Vienna is blending its academic strength and startup culture to drive AI innovation in ethics, healthcare, and urban design.", coords: [48.2082, 16.3738] },
+    { name: 'Washington DC', url: 'https://ai-washingtondc.com', desc: "Washington DC is shaping AI policy while also investing in cybersecurity, defense tech, and public-sector AI applications.", coords: [38.9072, -77.0369] },
+    { name: 'Zurich', url: 'https://ai-zurich.com', desc: "Zurich is a global AI research leader, home to ETH Zurich and a growing tech industry focused on robotics, machine learning, and automation.", coords: [47.3769, 8.5417] },
+{ name: 'Amsterdam', url: 'https://amsterdam-ai.com', desc: "Amsterdam blends innovation with sustainability, hosting a thriving tech startup ecosystem known for AI, fintech, and smart mobility.", coords: [52.3676, 4.9041] },
+{ name: 'Brussels', url: 'https://brussels-ai.com', desc: "Brussels is quietly shaping the future of AI through a powerful mix of EU-driven regulation, ethical leadership, and a growing ecosystem of startups and research hubs.", coords: [50.8503, 4.3517] },
+{ name: 'Seoul', url: 'https://seoul-ai.com', desc: "Seoul leads Asia’s digital future with cutting-edge robotics, 5G infrastructure, and a booming AI and semiconductor industry.", coords: [37.5665, 126.9780] },
+{ name: 'Tel Aviv', url: 'https://telaviv-ai.com', desc: "Tel Aviv is a global tech powerhouse, nicknamed \"Startup City,\" with deep strengths in cybersecurity, AI, and biotech.", coords: [32.0853, 34.7818] }
+
+  ];
+  // Define world bounds
+  const worldBounds = L.latLngBounds(
+    L.latLng(-85, -180),
+    L.latLng(85, 180)
+  );
+// Example markers (replace with your own)
+const markerss = [
+  [12.9716, 77.5946],[41.3851, 2.1734],[-34.6037, -58.3816],[36.7783, -119.4179],[53.8008, -1.5491],[28.6139, 77.2090],[37.4563, 126.7052],[64.9631, -19.0208],[56.2639, 9.5018],[25.276987, 51.520008],[53.3498, -6.2603],[23.1291, 113.2644],
+  [53.4808, -2.2426],[14.5995, 120.9842],[-37.8136, 144.9631],[19.4326, -99.1332],[45.5017, -73.5673],[19.0760, 72.8777],[40.7128, -74.0060],[40.3399, 127.5101],[39.9526, -75.1652],[64.1355, -21.8954],[41.9028, 12.4964],[61.5240, 105.3188],
+  [37.3382, -121.8863],[-23.5505, -46.6333],[47.6062, -122.3321],[22.5431, 114.0579],[1.3521, 103.8198],[25.032969, 121.565418],[49.2827, -123.1207],[48.2082, 16.3738],[38.9072, -77.0369],[47.3769, 8.5417],[52.3676, 4.9041],[50.8503, 4.3517],
+  [37.5665, 126.9780],[32.0853, 34.7818]
+];
+
+// Create marker group
+const markerGroup = L.featureGroup(
+  markerss.map(m => L.marker(m))
+);
+
+function getMapSettings() {
+  const isMobile = L.Browser.mobile || window.innerWidth < 768;
+
+  return {
+    // Center differently
+    center: isMobile ? [18, -10] : [20, 0],
+
+    // Zoom settings
+    zoom: isMobile ? 1.2 : 1.8,
+    minZoom: isMobile ? 1 : 2,
+    maxZoom: isMobile ? 4 : 5,
+
+    // Fit bounds padding (different for mobile vs desktop)
+    fitPadding: isMobile ? [50, 50] : [20, 20],
+
+    // ✅ Different world bounds
+    maxBounds: isMobile
+      ? L.latLngBounds(L.latLng(-45, -180), L.latLng(80, 180)) // looser vertical bounds for mobile
+      : L.latLngBounds(L.latLng(-58, -180), L.latLng(76, 180)) // full world for desktop
+  };
+}
+
+let settings = getMapSettings();
+
+const map = L.map('map', {
+  zoomControl: true,
+  scrollWheelZoom: true,
+  doubleClickZoom: false,
+  boxZoom: false,
+  touchZoom: true,
+  dragging: true,
+  keyboard: false,
+
+  center: settings.center,
+  zoom: settings.zoom,
+  minZoom: settings.minZoom,
+  maxZoom: settings.maxZoom,
+
+  maxBounds: settings.maxBounds,   // ✅ use device-specific bounds
+  maxBoundsViscosity: 1.0,
+  worldCopyJump: false,
+  zoomSnap: 1,
+  zoomDelta: 1
+});
+
+// ✅ Add markers
+markerGroup.addTo(map);
+
+// ✅ Fit markers on load
+map.fitBounds(markerGroup.getBounds(), { padding: settings.fitPadding });
+
+// ✅ Auto-adjust on resize
+window.addEventListener("resize", () => {
+  const newSettings = getMapSettings();
+
+  map.setMinZoom(newSettings.minZoom);
+  map.setMaxZoom(newSettings.maxZoom);
+  // ✅ Update bounds
+  map.setMaxBounds(newSettings.maxBounds);
+
+  // Keep zoom inside allowed range
+  const currentZoom = map.getZoom();
+  if (currentZoom < newSettings.minZoom) {
+    map.setZoom(newSettings.minZoom);
+  } else if (currentZoom > newSettings.maxZoom) {
+    map.setZoom(newSettings.maxZoom);
+  }
+
+  // ✅ Re-fit markers with new padding if device type changed
+  if (newSettings.fitPadding[0] !== settings.fitPadding[0]) {
+    map.fitBounds(markerGroup.getBounds(), { padding: newSettings.fitPadding });
+  }
+
+  // Update settings
+  settings = newSettings;
+});
+
+
+  
+// const map = L.map('map', {
+//   zoomControl: true,
+//   scrollWheelZoom: true,
+//   doubleClickZoom: false,
+//   boxZoom: false,
+//   touchZoom: true,
+//   dragging: true,
+//   keyboard: false,
+//   center: [20, 0],
+//     zoom: 1.8,
+//     minZoom: 2, // Prevent zooming out too far
+//     maxZoom: 5,
+//     maxBounds: worldBounds,
+//     maxBoundsViscosity: 1.0,
+//     worldCopyJump: false,     // Prevent world copy when crossing boundary
+//     zoomSnap: 1,
+//     zoomDelta: 1
+// });
+
+  // Add base layer with no wrapping
+  /*L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    noWrap: true,             // Prevent horizontal tile repeating
+    continuousWorld: false,   // Deprecated but good for compatibility
+    bounds: worldBounds,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);*/
+  // Toner (high contrast, b/w)
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 20
+}).addTo(map);
+
+
+
+// Add markers
+const markers = L.featureGroup();
+cities.forEach(city => {
+  const marker = L.marker(city.coords).addTo(map);
+  marker.bindPopup(`
+    <strong>${city.name}</strong><br>${city.desc}<br><br>
+    <a href="${city.url}" target="_blank">${city.url}</a>
+  `);
+  markers.addLayer(marker);
+});
+
+/*-------------------------------*/
+ // Function to get region based on city name or coordinates
+function getRegion(city) {
+  const name = city.name.toLowerCase();
+
+  if (["austin", "california", "montreal", "new york city", "philadelphia", "san jose", "seattle", "vancouver", "washington dc"].includes(name)) {
+    return "North America";
+  }
+
+  if (["buenos aires", "mexico city", "são paulo"].includes(name)) {
+    return "South America";
+  }
+
+  if (["barcelona", "dublin", "denmark", "iceland", "leeds", "manchester", "reykjavik", "rome", "russia", "vienna", "zurich", "amsterdam", "brussels"].includes(name)) {
+    return "Europe";
+  }
+
+  if (["bangalore", "delhi", "guangzhou", "incheon", "manila", "melbourne", "mumbai", "shenzhen", "singapore", "taipei", "seoul"].includes(name)) {
+    return "Asia";
+  }
+
+  if (["tel aviv", "doha"].includes(name)) {
+    return "Middle East";
+  }
+
+  if (["north korea"].includes(name)) {
+    return "Other";
+  }
+
+  return "Uncategorized";
+} 
+
+const openBtn = document.getElementById('OpenNewsLetterr');
+  const closeBtn = document.getElementById('closePopup');
+  const overlay = document.getElementById('popupOverlay');
+
+  // Open popup
+  openBtn.addEventListener('click', () => {
+    overlay.style.display = 'block';
+  });
+
+  // Close popup with close button
+  closeBtn.addEventListener('click', () => {
+    overlay.style.display = 'none';
+  });
+
+  // Close popup by clicking outside
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) {
+      overlay.style.display = 'none';
+    }
+  });
+</script>
+<noscript>
+    <style>.hero__video{display:none}.hero{background:#0b0b0b url("/video/hero-poster.jpg") center/cover no-repeat}</style>
+  </noscript>
+<script src="script.js"></script>
+
+</body>
+</html>
+
