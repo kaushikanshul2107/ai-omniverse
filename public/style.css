@@ -34,6 +34,14 @@ svg#Layer_1 {
 .rte a {
     color: #BF5700;
 }
+footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 9;
+}
 @media screen and (max-width: 480px) {
    .form-buttons-wrapper.form-buttons-left.jsTest-button-wrapperField {
          width: 100%;
