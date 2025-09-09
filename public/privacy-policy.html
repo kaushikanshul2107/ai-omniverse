@@ -19,87 +19,13 @@
  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="relative">
-	<!-- Overlay with Popup -->
-	<div class="overlay" id="popupOverlay">
-	  <div class="popup max-w-3xl mx-auto bg-white shadow-2xl rounded-3xl p-10 md:p-12 relative z-10 backdrop-blur-sm border border-gray-100">
-		<span class="close-btn" id="closePopup">&times;</span>
-	  
-	  <h1>Newsletter Signup</h1>
-		<form id="newsletter-form" class="space-y-6">
-		  <div class="relative">
-			<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-			<input type="email" id="email" name="email" placeholder="you@example.com" required
-			  class="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-		  </div>
-
-		  <button type="submit"
-			class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl transition duration-300 shadow-md hover:shadow-lg">
-			🚀 Subscribe Now
-		  </button>
-		</form>
-	  </div>
-	</div>
 	<header class="site-header header">            
 		<div class="header__logo">
 		  <a href="index.html" class="logo">
-			<img src="SVG-02.svg" />
+			<img src="SVG-41.svg" />
 		  </a>	
 		</div>
-        <div class="header__components">                
-          <div class="header__navbar">                    
-			<nav class="header-links">        
-              <ul class="header-links__list">
-                <li class="header-links__item"><a href="index.html#mapofnetwork" title="News" class="header-links__link anchorlink">Map</a></li>
-                <li class="header-links__item"><a href="index.html#FutureInAustin" title="Blog" class="header-links__link anchorlink">Companies</a></li>
-                <li class="header-links__item"><a href="index.html#Connect" title="Events" class="header-links__link anchorlink">Connect</a></li>
-                <li class="header-links__item"><a target="_blank" href="https://news.google.com/search?q=austin+artificial+intelligence" title="Companies" class="header-links__link ">News</a></li>          
-              </ul>
-              <!-- tag content - may be ignored! -->
-			</nav>
-          </div>
-		  <div class="header__letter-button">
-            <a id="OpenNewsLetterr" data-hash="newsLetter" class="letter-button usw">
-                <span class="letter-button__desktop-text">Newsletter</span>
-                <span class="letter-button__mobile-text">
-                    <svg width="14" height="10" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M0.5 0.658593H5.5333L8.1751 6.08002L5.5333 11.3414H0.5L3.42632 6.08003L0.5 0.658593Z"></path>
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 0.658593H12.5333L15.1751 6.08002L12.5333 11.3414H7.5L10.4263 6.08003L7.5 0.658593Z"></path>
-                    </svg>
-                    Subscribe to our newsletter
-				</span>
-			</a>
-          </div>			
-		  <div class="header__control">
-			<button id="menuToggle" type="button" class="menu-toggle is-desktop-visible">
-				<span class="menu-toggle__bar-wrapper">
-					<span class="menu-toggle__bar"></span>
-					<span class="menu-toggle__bar"></span>
-					<span class="menu-toggle__bar"></span>
-				</span>
-				<p class="ghost">
-					Open menu
-				</p>
-			</button>
-		  </div>
-        </div>
-	</header>
-	
-
-<!-- Mobile Drawer Menu -->
-<div class="navbar"> 
-<div class="navbar__inner"> 
-<div class="navbar__links"> 
-<nav class="header-links"> 
-<ul class="header-links__list">
-	<li class="header-links__item"><a href="index.html#mapofnetwork" title="News" class="header-links__link anchorlink drawermenu__link"> Map </a></li> 
-	<li class="header-links__item"><a href="index.html#FutureInAustin" title="Companies" class="header-links__link anchorlink drawermenu__link"> Companies </a></li> 
-	<li class="header-links__item"><a href="index.html#Connect" title="Connect" class="header-links__link anchorlink drawermenu__link"> Connect </a></li> 
-	<li class="header-links__item"><a class="header-links__link drawermenu__link" href="https://news.google.com/search?q=austin+ai" title="News" target="_blank" rel="noopener noreferrer" >News</a></li> 
- </ul> <!-- tag content - may be ignored! --> 
- </nav> 
- </div> 
- </div> 
- </div>
+	</header> 
 	
  <section id="policies_header" class="bg-white relative z-10 w-full mt-8 mob-mt-0 pt-8  text-left">
 	<div class="warranty-banner">
@@ -192,70 +118,6 @@
     &copy; 2025 AI Omniverse. All rights reserved.
 	</div>
   </footer>
-
- 
-<script>
-  const menuToggle = document.getElementById('menuToggle');
-const nav = document.querySelector('.navbar .header-links');
-
-function closeMenu() {
-  menuToggle?.classList.remove('is-active');
-  document.body.classList.remove('navbar-open');
-}
-
-menuToggle?.addEventListener('click', () => {
-  menuToggle.classList.toggle('is-active');
-  document.body.classList.toggle('navbar-open');
-});
-
-// Delegate clicks from the nav (works for all links inside)
-nav?.addEventListener('click', (e) => {
-  const link = e.target.closest('a.header-links__link');
-  if (!link) return;
-
-  const openInNewTab = link.target === '_blank' || e.ctrlKey || e.metaKey;
-
-  if (openInNewTab) {
-    // Force-open the new tab, then close the menu
-    window.open(link.href, '_blank', 'noopener');
-    e.preventDefault();
-  }
-
-  // Close the menu after the click has been handled
-  requestAnimationFrame(closeMenu);
-});
-
-// Middle-click (auxclick) also opens in a new tab on most browsers
-nav?.addEventListener('auxclick', (e) => {
-  if (e.button !== 1) return; // only middle button
-  const link = e.target.closest('a.drawermenu__link');
-  if (!link) return;
-
-  window.open(link.href, '_blank', 'noopener');
-  e.preventDefault();
-  requestAnimationFrame(closeMenu);
-});
-const openBtn = document.getElementById('OpenNewsLetterr');
-  const closeBtn = document.getElementById('closePopup');
-  const overlay = document.getElementById('popupOverlay');
-
-  // Open popup
-  openBtn.addEventListener('click', () => {
-    overlay.style.display = 'block';
-  });
-
-  // Close popup with close button
-  closeBtn.addEventListener('click', () => {
-    overlay.style.display = 'none';
-  });
-
-  // Close popup by clicking outside
-  overlay.addEventListener('click', (event) => {
-    if (event.target === overlay) {
-      overlay.style.display = 'none';
-    }
-  });
-</script>
 <script src="script.js"></script>
 </body>
 
