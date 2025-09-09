@@ -317,7 +317,7 @@ width:400px;            /* Set a firm max width */
     justify-content: center;
     background: transparent;
     align-items: center;
-    padding: 0 40px;
+    padding: 10px 40px;
 }
 .header__logo {
     width: auto;
