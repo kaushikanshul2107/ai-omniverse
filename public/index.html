@@ -13,114 +13,16 @@
   <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
   <link rel="stylesheet" href="style.css" />
   <style>
-	  body > section {
-    scroll-margin-top: 70px;scroll-padding-bottom: 100px; 
-}
-	  .leaflet-marker-icon {
+.leaflet-marker-icon {
   filter: invert(100%) brightness(200%);
 }
-    :root{
-      --brand:#4cafef;
-      --brand-hover:#2196f3;
-      --ai:#f1f1f1;
-      --text:#111;
-    }
-    *{box-sizing:border-box}
-.anchorlink.customlinhyt {
-    line-height: 2;
-}
-    /* Overlay (click-outside to close) */
-    #chatOverlay{
-      position:fixed;inset:0;background:rgba(0,0,0,.2);backdrop-filter:saturate(120%) blur(1px);
-      display:none;z-index:998;
-    }
-
-    /* Floating Mic */
-    #micButton{
-      cursor:pointer;
-    }
-    #micButton:active{transform:scale(.98)}
-    #micButton.listening{animation:pulse 1.5s infinite}
-    @keyframes pulse{
-      0%{box-shadow:0 0 0 0 rgba(229,57,53,.7)}
-      70%{box-shadow:0 0 0 20px rgba(229,57,53,0)}
-      100%{box-shadow:0 0 0 0 rgba(229,57,53,0)}
-    }
-
-    /* Chatbox */
-    #chatbox {
-    left: 100px;
-    position: absolute;
-    bottom: -25px;
-    right: auto;
-    width: 640px;
-    height: 280px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    z-index: 999;
-}
-
-    /* Top bar */
-    #chatTop{
-      padding:10px;border-bottom:1px solid #eee;background:#fff;display:flex;align-items:center
-    }
-    #closeChat{
-      margin-left:auto;background:transparent;border:none;font-size:18px;line-height:1;cursor:pointer;color:#666
-    }
-    #closeChat:hover{color:#000}
-
-    #chatMessages{flex:1;padding:12px;overflow-y:auto;font-size:14px;background:#fff}
-    .message{margin:6px 0;padding:8px 10px;border-radius:10px;max-width:85%;word-wrap:break-word;white-space:pre-wrap}
-    .user{background:var(--brand);color:#fff;align-self:flex-end}
-    .ai{background:var(--ai);color:#000;align-self:flex-start}
-
-    #chatInputArea{display:flex;border-top:1px solid #eee;background:#fff}
-    #chatInput{flex:1;padding:12px;border:none;outline:none;font-size:14px}
-    #sendButton{background:var(--brand);border:none;color:#fff;padding:10px 14px;cursor:pointer}
-    #sendButton:hover{background:var(--brand-hover)}
-
-    /* Articles rendering */
-    .article-list{margin:6px 0 8px;padding-left:0;list-style:none}
-    .article-item{margin:6px 0}
-    .article-item a{text-decoration:none;font-weight:600;color:#0b69ff}
-    .article-item a:hover{text-decoration:underline}
-    .article-meta{display:block;font-size:12px;color:#666;margin-top:2px}
-    .as-of{font-size:12px;color:#555;margin-top:8px}
-	/* Thinking indicator */
-    .typing{ display:inline-flex; align-items:center; gap:6px }
-    .typing .dot{ width:6px; height:6px; border-radius:50%; background:#555; animation:bounce 1s infinite ease-in-out }
-    .typing .dot:nth-child(2){ animation-delay:.15s } .typing .dot:nth-child(3){ animation-delay:.3s }
-    @keyframes bounce{ 0%,80%,100%{ transform:scale(.6); opacity:.6 } 40%{ transform:scale(1); opacity:1 } }
-
-	  @media screen and (max-width: 768px) {
-	  #chatbox {
-    left: auto;
-    bottom: 100%;
-    width: 480px;
-    height: 400px;
-    margin-bottom: 20px;
-}
-		  .btn_withlovedby {
-    align-items: center;
-}
-	  }
-	  @media screen and (max-width: 600px) {
-	  #chatbox {
-    width: 310px;
-}
-	  }
-
-	  form#contact-form {
+form#contact-form {
     display: flex;
     align-items: center;
     padding: 15px 0;
     gap: 15px;
 }
-	  #contact-form button {
+#contact-form button {
     margin: 0;
 }
 	  /* Container holds video + content */
