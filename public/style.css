@@ -304,6 +304,9 @@ width:400px;            /* Set a firm max width */
     -ms-flex-preferred-size: auto;
     flex-basis: auto;
 }
+input#email {
+    flex: 0 0 75%;
+}
 .header {
     -webkit-box-align: start;
     -ms-flex-align: start;
@@ -311,7 +314,7 @@ width:400px;            /* Set a firm max width */
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    position: fixed;
+    position: absolute;
     z-index: 25;
     top: 0;
     justify-content: center;
